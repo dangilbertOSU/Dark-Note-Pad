@@ -13,6 +13,7 @@ class DarkNotePad(tk.Frame):
         self.textbox = None
 
         self.master.bind("<Control-s>", self.save_event)
+        self.master.bind("<Control-o>", self.open_event)
 
         window_height = 500
         window_width = 900
@@ -34,13 +35,12 @@ class DarkNotePad(tk.Frame):
 
         # file
         file_menu = tk.Menu(menu_bar, tearoff=0)
-        file_menu.add_command(label="Open", command=self.open)
-        file_menu.add_command(label="Save", command=self.save)
+        file_menu.add_command(label="Open", command=self.open, accelerator="Ctrl+O")
+        file_menu.add_command(label="Save", command=self.save, accelerator="Ctrl+S")
         menu_bar.add_cascade(label="File", menu=file_menu)
 
         # edit
         edit_menu = tk.Menu(menu_bar, tearoff=0)
-        edit_menu.add_command(label="Undo", command=self.hello)
         menu_bar.add_cascade(label="Edit", menu=edit_menu)
 
         self.master.config(menu=menu_bar)
@@ -69,6 +69,8 @@ class DarkNotePad(tk.Frame):
     def open(self):
         file = fd.askopenfilename(initialdir="/", title="Select file",
                                   filetypes=(("text files", "*.txt"), ("all files", "*.*")))
+        if not file:
+            return
         f = open(file, "r")
         text = f.read()
         self.textbox.delete('1.0', "end")
@@ -76,6 +78,9 @@ class DarkNotePad(tk.Frame):
 
     def save_event(self, event):
         self.save()
+
+    def open_event(self, event):
+        self.open()
 
 
 root = tk.Tk()
