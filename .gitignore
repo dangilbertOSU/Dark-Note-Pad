@@ -1,0 +1,5 @@
+# ignore files
+Dark Notepad.spec
+
+# ignore dirs
+build/
