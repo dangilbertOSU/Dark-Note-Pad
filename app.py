@@ -6,15 +6,16 @@ class DarkNotePad(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
-
         self.pack()
         self.master.title("Dark Notepad")
 
+        # setting the global textbox variable
         self.textbox = None
 
-        self.master.bind("<Control-s>", self.save_event)
-        self.master.bind("<Control-o>", self.open_event)
+        self.create_shortcuts()
+        self.create_window()
 
+    def create_window(self):
         window_height = 500
         window_width = 900
 
@@ -23,20 +24,25 @@ class DarkNotePad(tk.Frame):
 
         x_coordinate = int((screen_width / 2) - (window_width / 2))
         y_coordinate = int((screen_height / 2) - (window_height / 2))
-        self.master.geometry("{}x{}+{}+{}".format(window_width, window_height, x_coordinate, y_coordinate))
+        self.master.geometry(
+            "{}x{}+{}+{}".format(window_width, window_height, x_coordinate, y_coordinate))
         self.create_widgets(screen_width, screen_height)
 
     def create_widgets(self, height, width):
         self.create_menu()
         self.create_textbox(height, width)
+        scrollbar = tk.Scrollbar(self.master)
+        scrollbar.pack(side=tk.RIGHT, fill='y')
 
     def create_menu(self):
         menu_bar = tk.Menu(self.master)
 
         # file
         file_menu = tk.Menu(menu_bar, tearoff=0)
-        file_menu.add_command(label="Open", command=self.open, accelerator="Ctrl+O")
-        file_menu.add_command(label="Save", command=self.save, accelerator="Ctrl+S")
+        file_menu.add_command(
+            label="Open", command=self.open, accelerator="Ctrl+O")
+        file_menu.add_command(
+            label="Save", command=self.save, accelerator="Ctrl+S")
         menu_bar.add_cascade(label="File", menu=file_menu)
 
         # edit
@@ -55,24 +61,29 @@ class DarkNotePad(tk.Frame):
         self.textbox.focus()
         self.textbox.config(insertbackground='#568af2')
 
-    def hello(self):
-        print('clicked open!')
+    def create_shortcuts(self):
+        self.master.bind("<Control-s>", self.save_event)
+        self.master.bind("<Command-s>", self.save_event)
+        self.master.bind("<Control-o>", self.open_event)
+        self.master.bind("<Command-o>", self.open_event)
 
     def save(self):
         input_text = self.textbox.get("1.0", "end")
-        f = fd.asksaveasfile(mode='w', defaultextension=".txt")
-        if f is None:  # asksaveasfile return `None` if dialog closed with "cancel".
+        file_out = fd.asksaveasfile(mode='w', defaultextension=".txt")
+
+        # asksaveasfile return `None` if dialog closed with "cancel".
+        if file_out is None:
             return
-        f.write(input_text)
-        f.close()
+        file_out.write(input_text)
+        file_out.close()
 
     def open(self):
-        file = fd.askopenfilename(initialdir="/", title="Select file",
-                                  filetypes=(("text files", "*.txt"), ("all files", "*.*")))
-        if not file:
+        file_name = fd.askopenfilename(initialdir="/", title="Select file",
+                                       filetypes=(("text files", "*.txt"), ("all files", "*.*")))
+        if not file_name:
             return
-        f = open(file, "r")
-        text = f.read()
+        file_in = open(file_name, "r")
+        text = file_in.read()
         self.textbox.delete('1.0', "end")
         self.textbox.insert('1.0', text)
 
